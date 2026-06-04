@@ -1,2 +1,2 @@
 # Casa-Inteligente-NodeRED
-Proyecto IoT de Casa Inteligente desarrollado en Node-RED
+Proyecto desarrollado por Angélica Alvarado y Thalia Mina para la asignatura de IoT utilizando Node-RED y GitHub.
