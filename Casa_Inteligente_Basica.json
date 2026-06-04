@@ -1,0 +1,797 @@
+[
+    {
+        "id": "tab_casa_domotica_v2",
+        "type": "tab",
+        "label": "Casa Inteligente Básica",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "template_tarjetas_v2",
+        "type": "ui-template",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_tarjetas_v2",
+        "name": "Tarjetas superiores",
+        "order": 1,
+        "width": "12",
+        "height": "3",
+        "format": "<div style=\"display:grid;grid-template-columns:repeat(3,1fr);gap:18px;font-family:'Segoe UI',Arial;\">\n<div style=\"background:rgb(15,23,42);color:white;border:1px solid rgb(51,65,85);border-radius:18px;padding:22px;box-shadow:0 8px 20px rgba(0,0,0,.25);\"><div style=\"font-size:34px;\">🌡️</div><div style=\"font-size:20px;font-weight:800;margin-top:8px;\">Monitoreo Ambiental</div><div style=\"font-size:13px;margin-top:6px;color:rgb(203,213,225);\">Temperatura del hogar en tiempo real.</div></div>\n<div style=\"background:rgb(15,23,42);color:white;border:1px solid rgb(51,65,85);border-radius:18px;padding:22px;box-shadow:0 8px 20px rgba(0,0,0,.25);\"><div style=\"font-size:34px;\">💡</div><div style=\"font-size:20px;font-weight:800;margin-top:8px;\">Iluminación Inteligente</div><div style=\"font-size:13px;margin-top:6px;color:rgb(203,213,225);\">Control de luces por área de la vivienda.</div></div>\n<div style=\"background:rgb(15,23,42);color:white;border:1px solid rgb(51,65,85);border-radius:18px;padding:22px;box-shadow:0 8px 20px rgba(0,0,0,.25);\"><div style=\"font-size:34px;\">⚡</div><div style=\"font-size:20px;font-weight:800;margin-top:8px;\">Gestión Energética</div><div style=\"font-size:13px;margin-top:6px;color:rgb(203,213,225);\">Consumo calculado según luces encendidas.</div></div>\n</div>",
+        "templateScope": "local",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "inject_temp_v2",
+        "type": "inject",
+        "z": "tab_casa_domotica_v2",
+        "name": "Generar temperatura",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "once": true,
+        "onceDelay": "1",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            [
+                "function_temp_v2"
+            ]
+        ]
+    },
+    {
+        "id": "function_temp_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Temperatura aleatoria",
+        "func": "let temperatura = Math.floor(Math.random() * (35 - 18 + 1)) + 18;\nmsg.payload = temperatura;\nreturn msg;",
+        "outputs": 1,
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "gauge_temp_v2",
+                "estado_temp_v2",
+                "debug_temp_v2"
+            ]
+        ]
+    },
+    {
+        "id": "gauge_temp_v2",
+        "type": "ui-gauge",
+        "z": "tab_casa_domotica_v2",
+        "name": "Temperatura",
+        "group": "grupo_temp_v2",
+        "order": 1,
+        "width": "4",
+        "height": "4",
+        "gtype": "gage",
+        "gstyle": "rounded",
+        "title": "Temperatura de la casa",
+        "units": "°C",
+        "segments": [
+            {
+                "from": "18",
+                "color": "#22c55e"
+            },
+            {
+                "from": "28",
+                "color": "#eab308"
+            },
+            {
+                "from": "32",
+                "color": "#ef4444"
+            }
+        ],
+        "min": "18",
+        "max": "40",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "x": 670,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "estado_temp_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado temperatura",
+        "func": "let t = msg.payload;\nif (t < 20) {\n    msg.payload = \"❄️ Temperatura baja: \" + t + \" °C\";\n} else if (t <= 28) {\n    msg.payload = \"✅ Temperatura normal: \" + t + \" °C\";\n} else {\n    msg.payload = \"🔥 Temperatura alta: \" + t + \" °C\";\n}\nreturn msg;",
+        "outputs": 1,
+        "x": 670,
+        "y": 190,
+        "wires": [
+            [
+                "text_temp_v2"
+            ]
+        ]
+    },
+    {
+        "id": "text_temp_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_temp_v2",
+        "order": 2,
+        "width": "4",
+        "height": "1",
+        "name": "Texto temperatura",
+        "label": "Estado",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 910,
+        "y": 190,
+        "wires": []
+    },
+    {
+        "id": "debug_temp_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug temperatura",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 680,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "luz_general_v2",
+        "type": "ui-switch",
+        "z": "tab_casa_domotica_v2",
+        "name": "Luces general",
+        "label": "Encender / Apagar todas",
+        "group": "grupo_luces_v2",
+        "order": 1,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "general",
+        "topicType": "str",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "x": 160,
+        "y": 380,
+        "wires": [
+            [
+                "estado_luz_general_v2",
+                "control_general_v2",
+                "debug_luz_general_v2"
+            ]
+        ]
+    },
+    {
+        "id": "estado_luz_general_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado luz general",
+        "func": "msg.payload = msg.payload === true ? \"💡 Todas las luces encendidas\" : \"🌑 No todas las luces están encendidas\";\nreturn msg;",
+        "outputs": 1,
+        "x": 430,
+        "y": 320,
+        "wires": [
+            [
+                "text_luz_general_v2"
+            ]
+        ]
+    },
+    {
+        "id": "text_luz_general_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_luces_v2",
+        "order": 2,
+        "width": "4",
+        "height": "1",
+        "name": "Texto luces general",
+        "label": "Estado general",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 670,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "control_general_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Control General",
+        "func": "if (msg.from === \"verify\") {\n    return [null, null, null, null];\n}\n\nlet estado = msg.payload;\n\nflow.set(\"habitacion\", estado);\nflow.set(\"sala\", estado);\nflow.set(\"cocina\", estado);\nflow.set(\"bano\", estado);\n\nreturn [\n    { payload: estado, topic: \"habitacion\", from: \"general\" },\n    { payload: estado, topic: \"sala\", from: \"general\" },\n    { payload: estado, topic: \"cocina\", from: \"general\" },\n    { payload: estado, topic: \"bano\", from: \"general\" }\n];",
+        "outputs": 4,
+        "x": 420,
+        "y": 380,
+        "wires": [
+            [
+                "sw_habitacion_v2"
+            ],
+            [
+                "sw_sala_v2"
+            ],
+            [
+                "sw_cocina_v2"
+            ],
+            [
+                "sw_bano_v2"
+            ]
+        ]
+    },
+    {
+        "id": "debug_luz_general_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug luz general",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 430,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "sw_habitacion_v2",
+        "type": "ui-switch",
+        "z": "tab_casa_domotica_v2",
+        "name": "Luz habitación",
+        "label": "Habitación principal",
+        "group": "grupo_luces_v2",
+        "order": 3,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "habitacion",
+        "topicType": "str",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "x": 420,
+        "y": 560,
+        "wires": [
+            [
+                "estado_habitacion_v2",
+                "verificar_luces_v2",
+                "calcular_consumo_v2",
+                "debug_habitacion_v2"
+            ]
+        ]
+    },
+    {
+        "id": "sw_sala_v2",
+        "type": "ui-switch",
+        "z": "tab_casa_domotica_v2",
+        "name": "Luz sala",
+        "label": "Sala",
+        "group": "grupo_luces_v2",
+        "order": 5,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "sala",
+        "topicType": "str",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "x": 400,
+        "y": 630,
+        "wires": [
+            [
+                "estado_sala_v2",
+                "verificar_luces_v2",
+                "calcular_consumo_v2",
+                "debug_sala_v2"
+            ]
+        ]
+    },
+    {
+        "id": "sw_cocina_v2",
+        "type": "ui-switch",
+        "z": "tab_casa_domotica_v2",
+        "name": "Luz cocina",
+        "label": "Cocina",
+        "group": "grupo_luces_v2",
+        "order": 7,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "cocina",
+        "topicType": "str",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "x": 400,
+        "y": 700,
+        "wires": [
+            [
+                "estado_cocina_v2",
+                "verificar_luces_v2",
+                "calcular_consumo_v2",
+                "debug_cocina_v2"
+            ]
+        ]
+    },
+    {
+        "id": "sw_bano_v2",
+        "type": "ui-switch",
+        "z": "tab_casa_domotica_v2",
+        "name": "Luz baño",
+        "label": "Baño",
+        "group": "grupo_luces_v2",
+        "order": 9,
+        "width": "4",
+        "height": "1",
+        "passthru": true,
+        "decouple": false,
+        "topic": "bano",
+        "topicType": "str",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "x": 400,
+        "y": 770,
+        "wires": [
+            [
+                "estado_bano_v2",
+                "verificar_luces_v2",
+                "calcular_consumo_v2",
+                "debug_bano_v2"
+            ]
+        ]
+    },
+    {
+        "id": "estado_habitacion_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado habitación",
+        "func": "msg.payload = msg.payload === true ? \"🛏️ Habitación encendida\" : \"🛏️ Habitación apagada\";\nreturn msg;",
+        "outputs": 1,
+        "x": 850,
+        "y": 540,
+        "wires": [
+            [
+                "text_habitacion_v2"
+            ]
+        ]
+    },
+    {
+        "id": "estado_sala_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado sala",
+        "func": "msg.payload = msg.payload === true ? \"🛋️ Sala encendida\" : \"🛋️ Sala apagada\";\nreturn msg;",
+        "outputs": 1,
+        "x": 830,
+        "y": 620,
+        "wires": [
+            [
+                "text_sala_v2"
+            ]
+        ]
+    },
+    {
+        "id": "estado_cocina_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado cocina",
+        "func": "msg.payload = msg.payload === true ? \"🍳 Cocina encendida\" : \"🍳 Cocina apagada\";\nreturn msg;",
+        "outputs": 1,
+        "x": 840,
+        "y": 700,
+        "wires": [
+            [
+                "text_cocina_v2"
+            ]
+        ]
+    },
+    {
+        "id": "estado_bano_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado baño",
+        "func": "msg.payload = msg.payload === true ? \"🚿 Baño encendido\" : \"🚿 Baño apagado\";\nreturn msg;",
+        "outputs": 1,
+        "x": 830,
+        "y": 780,
+        "wires": [
+            [
+                "text_bano_v2"
+            ]
+        ]
+    },
+    {
+        "id": "verificar_luces_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Verificar luces",
+        "func": "flow.set(msg.topic, msg.payload);\n\nlet habitacion = flow.get(\"habitacion\") || false;\nlet sala = flow.get(\"sala\") || false;\nlet cocina = flow.get(\"cocina\") || false;\nlet bano = flow.get(\"bano\") || false;\n\nmsg.payload = habitacion && sala && cocina && bano;\nmsg.topic = \"general\";\nmsg.from = \"verify\";\n\nreturn msg;",
+        "outputs": 1,
+        "x": 860,
+        "y": 480,
+        "wires": [
+            [
+                "luz_general_v2"
+            ]
+        ]
+    },
+    {
+        "id": "calcular_consumo_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Calcular consumo",
+        "func": "let consumo = 200; // consumo base\n\nif (flow.get(\"habitacion\")) consumo += 100;\nif (flow.get(\"sala\")) consumo += 150;\nif (flow.get(\"cocina\")) consumo += 200;\nif (flow.get(\"bano\")) consumo += 80;\n\nmsg.payload = consumo;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 920,
+        "wires": [
+            [
+                "gauge_consumo_v2",
+                "estado_consumo_v2",
+                "debug_consumo_v2"
+            ]
+        ]
+    },
+    {
+        "id": "text_habitacion_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_luces_v2",
+        "order": 4,
+        "width": "4",
+        "height": "1",
+        "name": "Texto habitación",
+        "label": "Habitación",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1080,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "text_sala_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_luces_v2",
+        "order": 6,
+        "width": "4",
+        "height": "1",
+        "name": "Texto sala",
+        "label": "Sala",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1060,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "text_cocina_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_luces_v2",
+        "order": 8,
+        "width": "4",
+        "height": "1",
+        "name": "Texto cocina",
+        "label": "Cocina",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1070,
+        "y": 710,
+        "wires": []
+    },
+    {
+        "id": "text_bano_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_luces_v2",
+        "order": 10,
+        "width": "4",
+        "height": "1",
+        "name": "Texto baño",
+        "label": "Baño",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1060,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "debug_habitacion_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug habitación",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 850,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "debug_sala_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug sala",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 830,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "debug_cocina_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug cocina",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 830,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "debug_bano_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug baño",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 830,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "gauge_consumo_v2",
+        "type": "ui-gauge",
+        "z": "tab_casa_domotica_v2",
+        "name": "Consumo eléctrico",
+        "group": "grupo_consumo_v2",
+        "order": 1,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "4",
+        "height": "4",
+        "gtype": "gage",
+        "gstyle": "rounded",
+        "title": "Consumo eléctrico",
+        "alwaysShowTitle": false,
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "200",
+                "color": "#22c55e",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "450",
+                "color": "#eab308",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "600",
+                "color": "#ef4444",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": "200",
+        "max": "730",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "className": "",
+        "x": 1010,
+        "y": 880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "estado_consumo_v2",
+        "type": "function",
+        "z": "tab_casa_domotica_v2",
+        "name": "Estado consumo",
+        "func": "let c = msg.payload;\nif (c === 0) {\n    msg.payload = \"🌑 Sin consumo por luces: 0 W\";\n} else if (c < 400) {\n    msg.payload = \"✅ Consumo normal: \" + c + \" W\";\n} else {\n    msg.payload = \"⚠️ Consumo alto: \" + c + \" W\";\n}\nreturn msg;",
+        "outputs": 1,
+        "x": 1010,
+        "y": 930,
+        "wires": [
+            [
+                "text_consumo_v2"
+            ]
+        ]
+    },
+    {
+        "id": "text_consumo_v2",
+        "type": "ui-text",
+        "z": "tab_casa_domotica_v2",
+        "group": "grupo_consumo_v2",
+        "order": 2,
+        "width": "4",
+        "height": "1",
+        "name": "Texto consumo",
+        "label": "Estado",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1240,
+        "y": 930,
+        "wires": []
+    },
+    {
+        "id": "debug_consumo_v2",
+        "type": "debug",
+        "z": "tab_casa_domotica_v2",
+        "name": "debug consumo",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1010,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "grupo_tarjetas_v2",
+        "type": "ui-group",
+        "name": "Resumen",
+        "page": "ui_page_casa_v2",
+        "width": "12",
+        "height": "1",
+        "order": 1,
+        "showTitle": false,
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "grupo_temp_v2",
+        "type": "ui-group",
+        "name": "Sensor de temperatura",
+        "page": "ui_page_casa_v2",
+        "width": "4",
+        "height": "1",
+        "order": 2,
+        "showTitle": true,
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "grupo_luces_v2",
+        "type": "ui-group",
+        "name": "Control de iluminación",
+        "page": "ui_page_casa_v2",
+        "width": "4",
+        "height": "1",
+        "order": 3,
+        "showTitle": true,
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "grupo_consumo_v2",
+        "type": "ui-group",
+        "name": "Monitor de consumo",
+        "page": "ui_page_casa_v2",
+        "width": "4",
+        "height": "1",
+        "order": 4,
+        "showTitle": true,
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "ui_page_casa_v2",
+        "type": "ui-page",
+        "name": "Casa inteligente básica",
+        "ui": "a0c449154515e2e4",
+        "path": "/casa",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "ui_theme_casa_v2",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "a0c449154515e2e4",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "ui_theme_casa_v2",
+        "type": "ui-theme",
+        "name": "Tema Oscuro IoT",
+        "colors": {
+            "surface": "rgb(30,41,59)",
+            "primary": "rgb(14,165,233)",
+            "bgPage": "rgb(15,23,42)",
+            "groupBg": "rgb(30,41,59)",
+            "groupOutline": "rgb(51,65,85)"
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "12px",
+            "widgetGap": "10px"
+        }
+    },
+    {
+        "id": "a698fbda748d5ee4",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
